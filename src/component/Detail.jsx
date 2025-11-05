@@ -154,6 +154,8 @@ const Detail = () => {
                               <div className="flex items-center gap-2 text-sm">
                                 <span className="text-red-500">👁️</span>#
                                 {chapList.view}
+                                <span className="text-red-500">⏰</span>#
+                                {chapList.PublishedDate}
                               </div>
                             </Link>
                           ))
