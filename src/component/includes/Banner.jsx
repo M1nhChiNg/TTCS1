@@ -35,7 +35,7 @@ const Banner = () => {
           <div
             key={i}
             className={`w-3 h-3 rounded-full transition-all ${
-              i === index ? "bg-blue-500 scale-125" : "bg-gray-300"
+              i === index ? "bg-red-600 scale-125" : "bg-gray-300"
             }`}
           ></div>
         ))}
