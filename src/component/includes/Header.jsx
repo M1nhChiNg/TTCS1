@@ -1,22 +1,23 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
     <div className="p-4 bg-black flex items-center justify-between">
       <div className="flex items-center space-x-4">
-        <h1 className="text-[25px] uppercase font-bold text-red-600">
+        <Link to="/" className="text-[25px] uppercase font-bold text-red-600">
           🕮 TruyệnKMA
-        </h1>
+        </Link>
         <nav className="flex items-center space-x-4">
-          <a href="#" className="text-white">
+          <Link to="/" className="text-white">
             Trang chủ
-          </a>
-          <a href="#" className="text-white">
-            Thể loại
-          </a>
-          <a href="#" className="text-white">
+          </Link>
+          <Link to="/find" className="text-white">
+            Danh sách
+          </Link>
+          {/*<a href="#" className="text-white">
             Tác giả
-          </a>
+          </a>*/}
         </nav>
       </div>
       <div className="flex items-center space-x-4 ">
@@ -31,15 +32,16 @@ const Header = () => {
       </div>
       <div className="flex items-center space-x-4">
         <nav className="flex items-center space-x-4">
-          <a href="#" className="bg-white text-black rounded-3xl p-2 font-bold">
+          <Link to={'/login'}
+            className="bg-white text-black rounded-3xl p-2 font-bold ">
             Đăng nhập
-          </a>
-          <a
-            href="#"
+          </Link>
+          {/*<a
+            
             className="text-white border border-white rounded-3xl p-2 font-bold"
           >
             Đăng ký
-          </a>
+          </a>*/}
         </nav>
       </div>
     </div>
