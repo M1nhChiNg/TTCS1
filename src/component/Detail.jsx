@@ -4,16 +4,16 @@ import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "./includes/Header";
 import Footer from "./includes/Footer";
-
+import { Link } from "react-router-dom";
 const Detail = () => {
-  const { slug } = useParams();
+  const { StoryID } = useParams();
   const [data, setData] = useState([]);
+  const [chapter, setChapter] = useState([]);
   const [loading, setLoanding] = useState(true);
   const [error, setError] = useState(null);
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
-  const item = data?.data?.data?.item;
-
+  const item = data?.data;
   const handleAddComment = (e) => {
     const comment = e.target.value;
     if (comment.trim() === "") return;
@@ -30,34 +30,38 @@ const Detail = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `https://otruyenapi.com/v1/api/truyen-tranh/${slug}`
+          `http://localhost/Website-Truyen/Api/Story/GetStoryDetail.php?StoryID=${StoryID}`
         );
         setData(response);
+        const res1 = await axios.get(
+          `http://localhost/Website-Truyen/Api/Story/GetChapter.php?StoryID=${StoryID}`);
+        setChapter(res1);
+        
         setLoanding(false);
         console.log(response);
+        console.log("chap",res1)
       } catch (error) {
         setError(error.message);
         setLoanding(false);
       }
     };
     fetchData();
-  }, [slug]);
-
+  }, [StoryID]);
   if (loading) return <p>Loading... </p>;
   if (error) return <p>Error: {error}</p>;
 
   return (
     <div>
-      <Helmet>
-        <title>{data.data.data.seoOnPage.titleHead}</title>
-      </Helmet>
+     {/* <Helmet>
+        <title>{data.data.seoOnPage.titleHead}</title>
+      </Helmet>*/}
       <Header></Header>
       <div className="min-h-screen bg-[#1a1b1f] text-gray-200 p-4">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8">
           <div className="md:w-1/3 bg-[#111217] p-4 rounded-lg shadow-lg">
             <img
-              src={`https://img.otruyenapi.com/uploads/comics/${item.thumb_url}`}
-              alt={item.name}
+              src={`http://localhost/Website-Truyen/Assets/Img/${item.Img}`}
+              alt={item.StoryName}
               className="w-full rounded-md object-cover"
             />
 
@@ -86,7 +90,7 @@ const Detail = () => {
                 Theo Dõi
               </button>
               <button className="w-full py-2 bg-yellow-600 rounded-lg hover:bg-yellow-700">
-                Thông Báo
+                Like
               </button>
               <button className="w-full py-2 bg-gray-700 rounded-lg hover:bg-gray-600">
                 Đọc Từ Đầu
@@ -98,22 +102,21 @@ const Detail = () => {
             <div className="p-4">
               <div>
                 <h1 className="text-3xl font-bold text-white mb-2">
-                  {item.name}
+                  {item.StoryName}
                 </h1>
                 <div className="flex flex-wrap gap-2">
-                  {item.category && item.category.length > 0
-                    ? item.category.map((category, index) => (
-                        <div key={index}>
-                          <span className="bg-indigo-700/40 text-sm px-2 py-1 rounded">
-                            {category.name}
-                          </span>
-                        </div>
-                      ))
-                    : "Other"}
-                </div>
+             {item.CategoryName && item.CategoryName.length > 0 ? (
+           <span className="bg-indigo-700/40 text-sm px-2 py-1 rounded">
+              {item.CategoryName}
+             </span>
+                 ) : (
+                   "Other"
+                     )}
+                     </div>
+
               </div>
               <p className="text-sm leading-relaxed text-gray-300">
-                {item.content}
+                {item.Decrition}
               </p>
               <div>
                 <h2 className="text-lg font-semibold border-b border-gray-700 pb-1 mb-2">
@@ -121,11 +124,12 @@ const Detail = () => {
                 </h2>
                 <p className="text-sm">
                   <strong className="text-gray-400">TÁC GIẢ:</strong>{" "}
-                  <span className="text-gray-300">{item.author}</span>
+                  <span className="text-gray-300">{item.AuthorName}</span>
                 </p>
+                
                 <p className="text-sm">
-                  <strong className="text-gray-400">TRẠNG THÁI:</strong>{" "}
-                  <span className="text-green-400">{item.status}</span>
+                  <strong className="text-gray-400">TRẠNG THÁI:</strong>{" Đang cập nhật"}
+                  {/*<span className="text-green-400">{item.status}</span>*/}
                 </p>
               </div>
 
@@ -133,36 +137,35 @@ const Detail = () => {
                 <h2 className="text-lg font-semibold border-b border-gray-700 pb-1 mb-4">
                   Danh Sách
                 </h2>
+                </div>
                 {/* Hiển thị các chapters */}
-                {item.chapters && item.chapters.length > 0 ? (
-                  item.chapters.map((chap) => (
-                    <div key={chap.server_name}>
+                <div className="max-h-[500px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 pr-2">
+                
                       <div className="grid grid-cols-2 gap-2">
-                        {chap.server_data && chap.server_data.length > 0 ? (
-                          chap.server_data.map((chapList) => (
-                            <div
-                              key={chapList.filename}
+                        {chapter.data && chapter.data.length > 0 ? (
+                          chapter.data.map((chapList) => (
+                            <Link to={`/read/${chapList.ChapterID}?story=${item.StoryID}&storyname=${item.StoryName}`}
+                              key={chapList.ChapterID}
                               className="flex justify-between items-center bg-[#22232b] hover:bg-[#2c2d35] px-3 py-2 rounded-md cursor-pointer transition"
                             >
                               <div className="flex items-center gap-2 text-sm">
                                 <span className="text-red-500">👁️</span>#
-                                {chapList.chapter_name}
+                                {chapList.PublishedDate}
                               </div>
                               <div className="text-xs text-gray-400">
-                                {chap.views}
+                                {chapList.ChapterID}
                               </div>
-                            </div>
+                            </Link>
                           ))
                         ) : (
                           <span>Chapter coming soon...</span>
                         )}
                       </div>
-                    </div>
-                  ))
-                ) : (
-                  <span>Chapter coming soon...</span>
-                )}
-              </div>
+                    
+                  
+                
+                </div>
+                {/** */}
             </div>
           </div>
         </div>
