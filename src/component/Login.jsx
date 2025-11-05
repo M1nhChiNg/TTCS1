@@ -1,8 +1,53 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!isLogin && formData.password !== formData.confirmPassword) {
+      alert("Mật khẩu không khớp!");
+      return;
+    }
+    try {
+      const url = isLogin
+        ? "http://localhost/Website-Truyen/Api/Login.php"
+        : "http://localhost/Website-Truyen/Api/Register.php";
 
+      const res = await axios.post(url, formData);
+      const data = res.data;
+      if (isLogin) {
+        if (data.success) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+          alert("Đăng nhập thành công!");
+          window.location.href = "/"; 
+        } else {
+          alert(data.message || "Sai tài khoản hoặc mật khẩu!");
+        }
+      }
+      // Nếu đăng ký
+      else {
+        if (data.success) {
+          alert("Đăng ký thành công! Hãy đăng nhập.");
+          setIsLogin(true);
+        } else {
+          alert(data.message || "Email đã tồn tại!");
+        }
+      }
+    } catch (error) {
+      console.error("Lỗi:", error);
+      alert("Không thể kết nối đến server!");
+    }
+  };
   return (
     <div
       className="grid w-full h-screen place-items-center"
@@ -18,7 +63,7 @@ const Login = () => {
         <div className="relative flex h-12 mb-6 border border-gray-300 rounded-full overflow-hidden">
           <button
             onClick={() => setIsLogin(true)}
-            className={`w-1/2 text-lg font-medium transition-all z-10 ${
+            className={`w-1/2 text-lg font-medium transition-all z-10  ${
               isLogin ? "text-white" : "text-black"
             }`}
           >
@@ -39,23 +84,32 @@ const Login = () => {
           ></div>
         </div>
 
-        <form className="space-y-4">
-          {!isLogin && (
+        <form className="space-y-4" onSubmit={handleSubmit}>        
             <input
               type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
               placeholder="Enter your name"
               required
               className="w-full p-3 border-b-2 border-gray-300 outline-none focus:via-pink-500 placeholder-gray-400"
-            />
-          )}
+            />        
+          {!isLogin &&(
           <input
             type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
             placeholder="Email address"
             required
             className="w-full p-3 border-b-2 border-gray-300 outline-none focus:via-pink-500 placeholder-gray-400"
           />
+          )}
           <input
             type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
             placeholder="Password"
             required
             className="w-full p-3 border-b-2 border-gray-300 outline-none focus:via-pink-500 placeholder-gray-400"
@@ -63,7 +117,10 @@ const Login = () => {
           {!isLogin && (
             <input
               type="password"
-              placeholder="Confirm your name"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="Confirm your password"
               required
               className="w-full p-3 border-b-2 border-gray-300 outline-none focus:via-pink-500 placeholder-gray-400"
             />
