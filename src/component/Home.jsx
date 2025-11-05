@@ -9,12 +9,12 @@ const Home = () => {
   const [data, setData] = useState([]);
   const [loading, setLoanding] = useState(true);
   const [error, setError] = useState(null);
-  const items = data?.data?.data?.items;
+  const items = data?.data;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("https://otruyenapi.com/v1/api/home");
+        const response = await axios.get("http://localhost/Website-Truyen/Api/Home/GetStoryList.php");
         setData(response);
         setLoanding(false);
         console.log(response);
@@ -40,22 +40,22 @@ const Home = () => {
             items.length > 0 &&
             items.map((item) => {
               return (
-                <div key={item._id}>
-                  <Link to={`/comics/${item.slug}`}>
+                <div key={item.StoryID}>
+                  <Link to={`/comics/${item.StoryID}`}>
                     <div className="w-[200px] h-[400px] relative group shrink-0 bg-gray-800">
                       <div className="group-hover:scale-105 transition-transform duration-500 ease-in-out w-full h-full cursor-pointer">
                         <div className="absolute top-0 left-0 w-full h-full bg-black/40"></div>
 
                         <img
-                          src={`https://img.otruyenapi.com/uploads/comics/${item.thumb_url}`}
-                          alt={item.updatedAt}
+                          src={`http://localhost/Website-Truyen/Assets/Img/${item.Img}`}
+                          alt={item.PublishedDate}
                           className="w-full h-[300px] object-cover"
                         />
                         <div className="absolute mt-2 left-2">
                           <p className="uppercase text-shadow-md ">
-                            {item.name || "No Title"}
+                            {item.StoryName || "No Title"}
                           </p>
-                          <p className=" text-shadow-md ">{item.updatedAt}</p>
+                          <p className=" text-shadow-md ">{item.PublishedDate}</p>
                         </div>
                       </div>
                     </div>
