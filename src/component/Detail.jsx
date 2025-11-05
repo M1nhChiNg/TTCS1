@@ -148,12 +148,12 @@ const Detail = () => {
                               key={chapList.ChapterID}
                               className="flex justify-between items-center bg-[#22232b] hover:bg-[#2c2d35] px-3 py-2 rounded-md cursor-pointer transition"
                             >
+                              <div className="text-xs text-gray-400">
+                               Chương: {chapList.ChapterNumber}
+                              </div>
                               <div className="flex items-center gap-2 text-sm">
                                 <span className="text-red-500">👁️</span>#
-                                {chapList.PublishedDate}
-                              </div>
-                              <div className="text-xs text-gray-400">
-                                {chapList.ChapterID}
+                                {chapList.view}
                               </div>
                             </Link>
                           ))
