@@ -7,6 +7,7 @@ const Banner = () => {
     "../../../banner3.png",
     "../../../banner4.png",
     "../../../banner5.png",
+    "../../../banner6.png",
   ];
 
   const [index, setIndex] = useState(0);
