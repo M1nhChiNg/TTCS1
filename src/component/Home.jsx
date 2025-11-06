@@ -4,6 +4,7 @@ import Header from "./includes/Header";
 import Footer from "./includes/Footer";
 import Banner from "./includes/Banner";
 import { Link } from "react-router-dom";
+import StoryLoading from "./includes/loading/StoryLoading";
 
 const Home = () => {
   const [data, setData] = useState([]);
@@ -14,7 +15,10 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost/Website-Truyen/Api/Home/GetStoryList.php");
+        setLoanding(true);
+        const response = await axios.get(
+          "http://localhost/Website-Truyen/Api/Home/GetStoryList.php"
+        );
         setData(response);
         setLoanding(false);
         console.log(response);
@@ -26,7 +30,6 @@ const Home = () => {
     fetchData();
   }, []);
 
-  if (loading) return <p>Loading... </p>;
   if (error) return <p>Error: {error}</p>;
 
   return (
@@ -35,8 +38,21 @@ const Home = () => {
       <Banner></Banner>
       <div className="text-white p-10 mb-10">
         <h2 className="uppercase text-xl mb-4">Truyện Mới Cập Nhật </h2>
+        {/*Loading Skeleton*/}
+        {loading && (
+          <div className="flex flex-wrap gap-4">
+            <StoryLoading></StoryLoading>
+            <StoryLoading></StoryLoading>
+            <StoryLoading></StoryLoading>
+            <StoryLoading></StoryLoading>
+            <StoryLoading></StoryLoading>
+            <StoryLoading></StoryLoading>
+            <StoryLoading></StoryLoading>
+          </div>
+        )}
         <div className="flex flex-wrap gap-4">
           {items &&
+            !loading &&
             items.length > 0 &&
             items.map((item) => {
               return (
@@ -55,7 +71,9 @@ const Home = () => {
                           <p className="uppercase text-shadow-md ">
                             {item.StoryName || "No Title"}
                           </p>
-                          <p className=" text-shadow-md ">{item.PublishedDate}</p>
+                          <p className=" text-shadow-md ">
+                            {item.PublishedDate}
+                          </p>
                         </div>
                       </div>
                     </div>
