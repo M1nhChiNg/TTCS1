@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import Header from "./includes/Header";
+import Footer from "./includes/Footer";
 
 const emptyForm = {
   id: null,
@@ -189,13 +191,14 @@ const Admin = () => {
   };
 
   return (
-    <div className="p-6 min-h-screen bg-gray-100">
-      <div className="max-w-5xl mx-auto">
+    <div className=" min-h-screen bg-gray-100 flex flex-col">
+      <Header></Header>
+      <div className="flex-1 max-w-5xl mx-auto mt-10 ">
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-semibold">Admin - Quản lý truyện</h1>
           <button
             onClick={openAdd}
-            className="px-4 py-2 bg-pink-600 text-white rounded-md hover:opacity-90"
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:opacity-90"
           >
             Thêm truyện
           </button>
@@ -451,6 +454,7 @@ const Admin = () => {
           </div>
         )}
       </div>
+      <Footer></Footer>
     </div>
   );
 };
