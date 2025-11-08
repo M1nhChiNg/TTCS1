@@ -211,7 +211,7 @@ const Admin = () => {
             </thead>
             <tbody>
               {stories.length === 0 && (
-                <tr>
+                <tr key="empty">
                   <td
                     colSpan="5"
                     className="px-4 py-6 text-center text-gray-500"
@@ -267,7 +267,7 @@ const Admin = () => {
 
               <label className="block mb-2 text-sm">Tên truyện</label>
               <input
-                value={form.storyName}
+                value={form.storyName||""}
                 onChange={(e) => setForm({ ...form, storyName: e.target.value })}
                 className="w-full mb-3 px-3 py-2 border rounded"
                 placeholder="Tên Truyện"
@@ -275,21 +275,21 @@ const Admin = () => {
 
               <label className="block mb-2 text-sm">Tác giả</label>
               <input
-                value={form.author}
+                value={form.author||""}
                 onChange={(e) => setForm({ ...form, author: e.target.value })}
                 className="w-full mb-3 px-3 py-2 border rounded"
                 placeholder="Tác giả"
               />
               <label className="block mb-2 text-sm">Thể loại</label>
               <input
-                value={form.category}
+                value={form.category||""}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                 className="w-full mb-3 px-3 py-2 border rounded"
                 placeholder="Thể Loại"
               />
               <label className="block mb-2 text-sm">Đường dẫn ảnh</label>
               <input
-                value={form.img}
+                value={form.img||""}
                 onChange={(e) => setForm({ ...form, img: e.target.value })}
                 className="w-full mb-3 px-3 py-2 border rounded"
               />
@@ -298,7 +298,7 @@ const Admin = () => {
 
               <label className="block mb-2 text-sm">Mô tả</label>
               <textarea
-                value={form.descrition}
+                value={form.descrition||""}
                 onChange={(e) =>
                   setForm({ ...form, descrition: e.target.value })
                 }
@@ -360,7 +360,7 @@ const Admin = () => {
                     )}
                     {(getActiveStory()?.chapters || []).map((ch) => (
                       <div
-                        key={ch.id}
+                        key={ch.ChapterID}
                         className="p-2 border-b last:border-b-0 flex justify-between items-start gap-2"
                       >
                         <div>
@@ -394,7 +394,7 @@ const Admin = () => {
                   </h3>
                   <form onSubmit={handleChapterSubmit} className="space-y-3">
                     <input
-                      value={chapterForm.title}
+                      value={chapterForm.chapterNumber||"0"}
                       onChange={(e) =>
                         setChapterForm({
                           ...chapterForm,
@@ -405,7 +405,7 @@ const Admin = () => {
                       placeholder="Tiêu đề chapter"
                     />
                     <textarea
-                      value={chapterForm.content}
+                      value={chapterForm.content||"trống"}
                       onChange={(e) =>
                         setChapterForm({
                           ...chapterForm,

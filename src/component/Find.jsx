@@ -73,8 +73,8 @@ const Find = () => {
                 onClick={() => handleSelectAuthor(author.AuthorID)}
                 className={`p-3 rounded-lg bg-yellow-400 border text-sm transition ${
                   selectedAuthor === author.AuthorID
-                    ? "bg-red-500 text-white border-blue-500"
-                    : "hover:bg-gray-100 border-gray-300"
+                    ? "hover:scale-102 text-white border-blue-500"
+                    : "hover:scale-102 border-gray-300"
                 }`}
               >
                 {author.AuthorName}
@@ -93,8 +93,8 @@ const Find = () => {
                 onClick={() => handleSelectCategory(cat.CategoryID)}
                 className={`p-3 bg-blue-400 rounded-lg border text-sm transition ${
                   selectedCategory === cat.CategoryID
-                    ? "bg-green-500 text-white border-green-500"
-                    : "hover:bg-gray-100 border-gray-300"
+                    ? "hover:scale-102 text-white border-green-500"
+                    : "hover:scale-102 border-gray-300"
                 }`}
               >
                 {cat.CategoryName}
