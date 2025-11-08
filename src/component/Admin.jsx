@@ -1,18 +1,20 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Header from "./includes/Header";
 import Footer from "./includes/Footer";
 
 const emptyForm = {
-  id: null,
-  title: "",
+  storyID:"",
+  storyName: "",
   author: "",
-  status: "Đang tiến hành",
-  description: "",
+  category: "",
+  img: "",
+  descrition: "",
 };
 
-const emptyChapter = {
-  id: null,
-  title: "",
+const emptyChapter = { 
+  chapterID: "",
+  chapterNumber: "",
   content: "",
 };
 
@@ -32,29 +34,11 @@ const Admin = () => {
 
   useEffect(() => {
     // TODO: Thay bằng API
-    setStories([
-      {
-        id: 1,
-        title: "Truyện A",
-        author: "Tác giả 1",
-        status: "Hoàn thành",
-        description: "Mô tả ngắn A",
-        chapters: [
-          { id: 101, title: "Chương 1", content: "Nội dung chương 1" },
-          { id: 102, title: "Chương 2", content: "Nội dung chương 2" },
-        ],
-      },
-      {
-        id: 2,
-        title: "Truyện B",
-        author: "Tác giả 2",
-        status: "Đang tiến hành",
-        description: "Mô tả ngắn B",
-        chapters: [],
-      },
-    ]);
-  }, []);
-
+    axios
+        .get("http://localhost/Website-Truyen/Api/StoryDetail.php" )
+        .then((res1) => setStories(res1.data))
+        .catch((err) => console.error(err));
+  },[]);
   const openAdd = () => {
     setForm(emptyForm);
     setIsEditing(false);
@@ -70,8 +54,8 @@ const Admin = () => {
   const handleDelete = async (id) => {
     if (!confirm("Bạn có chắc muốn xóa truyện này?")) return;
     try {
-      // await axios.post('/Api/DeleteStory.php', { id });
-      setStories((s) => s.filter((x) => x.id !== id));
+      await axios.post('http://localhost/Website-Truyen/Api/DeleteStory.php', { id });
+      setStories((s) => s.filter((x) => x.StoryID !== id));
     } catch (err) {
       console.error(err);
       alert("Xóa thất bại");
@@ -80,21 +64,21 @@ const Admin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.title.trim() || !form.author.trim()) {
+    if (!form.storyName.trim() || !form.author.trim()) {
       alert("Vui lòng điền tiêu đề và tác giả");
       return;
     }
     setLoading(true);
     try {
       if (isEditing) {
-        // await axios.post('/Api/UpdateStory.php', form);
+        await axios.post('http://localhost/Website-Truyen/Api/UpdateStory.php', form);
         setStories((s) =>
           s.map((st) => (st.id === form.id ? { ...form } : st))
         );
         alert("Cập nhật thành công");
       } else {
-        // const res = await axios.post('/Api/AddStory.php', form);
-        const newItem = { ...form, id: Date.now(), chapters: [] };
+        const res = await axios.post('http://localhost/Website-Truyen/Api/AddStory.php', form);
+        const newItem = { ...form, chapters: [] };
         setStories((s) => [newItem, ...s]);
         alert("Thêm truyện thành công");
       }
@@ -109,7 +93,7 @@ const Admin = () => {
 
   // Chapters management
   const openChapters = (story) => {
-    setActiveStoryId(story.id);
+    setActiveStoryId(story.StoryID);
     setChaptersOpen(true);
     setChapterForm(emptyChapter);
     setIsEditingChapter(false);
@@ -122,7 +106,7 @@ const Admin = () => {
     setIsEditingChapter(false);
   };
 
-  const getActiveStory = () => stories.find((s) => s.id === activeStoryId);
+  const getActiveStory = () => stories.find((s) => s.StoryID === activeStoryId);
 
   const openAddChapter = () => {
     setChapterForm(emptyChapter);
@@ -139,7 +123,7 @@ const Admin = () => {
     setStories((prev) =>
       prev.map((s) =>
         s.id === activeStoryId
-          ? { ...s, chapters: s.chapters.filter((c) => c.id !== chapterId) }
+          ? { ...s, chapters: s.chapters.filter((c) => c.ChapterID !== chapterId) }
           : s
       )
     );
@@ -147,8 +131,8 @@ const Admin = () => {
 
   const handleChapterSubmit = (e) => {
     e.preventDefault();
-    if (!chapterForm.title.trim()) {
-      alert("Vui lòng nhập tiêu đề chương");
+    if (!chapterForm.chapterNumber.trim()) {
+      alert("Vui lòng nhập số chương");
       return;
     }
     setLoadingChapter(true);
@@ -157,11 +141,11 @@ const Admin = () => {
         // update
         setStories((prev) =>
           prev.map((s) =>
-            s.id === activeStoryId
+            s.chapters.ChapterID === activeStoryId
               ? {
                   ...s,
                   chapters: s.chapters.map((c) =>
-                    c.id === chapterForm.id ? { ...chapterForm } : c
+                    c.ChapterID === chapterForm.chapterID ? { ...chapterForm } : c
                   ),
                 }
               : s
@@ -170,10 +154,10 @@ const Admin = () => {
         alert("Cập nhật chương thành công");
       } else {
         // create
-        const newCh = { ...chapterForm, id: Date.now() };
+        const newCh = { ...chapterForm };
         setStories((prev) =>
           prev.map((s) =>
-            s.id === activeStoryId
+            s.StoryID === activeStoryId
               ? { ...s, chapters: [newCh, ...(s.chapters || [])] }
               : s
           )
@@ -215,7 +199,7 @@ const Admin = () => {
                   Tác giả
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium">
-                  Trạng thái
+                  Thể Loại
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium">
                   Mô tả
@@ -237,12 +221,12 @@ const Admin = () => {
                 </tr>
               )}
               {stories.map((s) => (
-                <tr key={s.id} className="border-t">
-                  <td className="px-4 py-3">{s.title}</td>
-                  <td className="px-4 py-3">{s.author}</td>
-                  <td className="px-4 py-3">{s.status}</td>
+                <tr key={s.StoryID} className="border-t">
+                  <td className="px-4 py-3">{s.StoryName}</td>
+                  <td className="px-4 py-3">{s.AuthorName}</td>
+                  <td className="px-4 py-3">{s.CategoryName}</td>                
                   <td className="px-4 py-3 text-sm text-gray-600">
-                    {s.description}
+                    {s.Descrition}
                   </td>
                   <td className="px-4 py-3 text-right space-x-2">
                     <button
@@ -252,7 +236,7 @@ const Admin = () => {
                       Sửa
                     </button>
                     <button
-                      onClick={() => handleDelete(s.id)}
+                      onClick={() => handleDelete(s.StoryID)}
                       className="px-3 py-1 bg-red-500 text-white rounded hover:opacity-90"
                     >
                       Xóa
@@ -281,12 +265,12 @@ const Admin = () => {
                 {isEditing ? "Sửa truyện" : "Thêm truyện"}
               </h2>
 
-              <label className="block mb-2 text-sm">Tiêu đề</label>
+              <label className="block mb-2 text-sm">Tên truyện</label>
               <input
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                value={form.storyName}
+                onChange={(e) => setForm({ ...form, storyName: e.target.value })}
                 className="w-full mb-3 px-3 py-2 border rounded"
-                placeholder="Tiêu đề truyện"
+                placeholder="Tên Truyện"
               />
 
               <label className="block mb-2 text-sm">Tác giả</label>
@@ -296,23 +280,27 @@ const Admin = () => {
                 className="w-full mb-3 px-3 py-2 border rounded"
                 placeholder="Tác giả"
               />
-
-              <label className="block mb-2 text-sm">Trạng thái</label>
-              <select
-                value={form.status}
-                onChange={(e) => setForm({ ...form, status: e.target.value })}
+              <label className="block mb-2 text-sm">Thể loại</label>
+              <input
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
                 className="w-full mb-3 px-3 py-2 border rounded"
-              >
-                <option>Đang tiến hành</option>
-                <option>Hoàn thành</option>
-                <option>Tạm ngưng</option>
-              </select>
+                placeholder="Thể Loại"
+              />
+              <label className="block mb-2 text-sm">Đường dẫn ảnh</label>
+              <input
+                value={form.img}
+                onChange={(e) => setForm({ ...form, img: e.target.value })}
+                className="w-full mb-3 px-3 py-2 border rounded"
+              />
+              
+              
 
               <label className="block mb-2 text-sm">Mô tả</label>
               <textarea
-                value={form.description}
+                value={form.descrition}
                 onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
+                  setForm({ ...form, descrition: e.target.value })
                 }
                 className="w-full mb-4 px-3 py-2 border rounded"
                 rows="3"
@@ -345,7 +333,7 @@ const Admin = () => {
             <div className="w-full max-w-3xl bg-white rounded-lg p-6 shadow-lg">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-medium">
-                  Chapters - {getActiveStory()?.title || "Truyện"}
+                  Chapters - {getActiveStory()?.StoryName || "Truyện"}
                 </h2>
                 <div className="flex gap-2">
                   <button
@@ -376,7 +364,7 @@ const Admin = () => {
                         className="p-2 border-b last:border-b-0 flex justify-between items-start gap-2"
                       >
                         <div>
-                          <div className="font-medium">{ch.title}</div>
+                          <div className="font-medium">{ch.StoryName}</div>
                           <div className="text-sm text-gray-600 line-clamp-3">
                             {ch.content}
                           </div>
@@ -389,7 +377,7 @@ const Admin = () => {
                             Sửa
                           </button>
                           <button
-                            onClick={() => handleDeleteChapter(ch.id)}
+                            onClick={() => handleDeleteChapter(ch.ChapterID)}
                             className="px-2 py-1 bg-red-500 text-white rounded text-sm"
                           >
                             Xóa

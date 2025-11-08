@@ -8,6 +8,7 @@ const Login = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "",
   });
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,8 +29,11 @@ const Login = () => {
       if (isLogin) {
         if (data.success) {
           localStorage.setItem("user", JSON.stringify(data.user));
-          alert("Đăng nhập thành công!");
-          window.location.href = "/"; 
+          alert("Đăng nhập thành công!");         
+          if(data.user.Role==0){
+            window.location.href ="/admin";
+          }else{
+          window.location.href = "/"; }
         } else {
           alert(data.message || "Sai tài khoản hoặc mật khẩu!");
         }

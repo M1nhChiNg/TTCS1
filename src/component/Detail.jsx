@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "./includes/Header";
 import Footer from "./includes/Footer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const Detail = () => {
   const { StoryID } = useParams();
   const [data, setData] = useState([]);
@@ -13,7 +13,59 @@ const Detail = () => {
   const [error, setError] = useState(null);
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
+  const navigate = useNavigate();
+  const [liked, setLiked] = useState(false);
+  const [userID, setUser]= useState(null);
+  const [isFollowed, setIsFollowed] = useState(false);  
+  const firstChapter = chapter?.data?.[0];
   const item = data?.data;
+  useEffect(() => {
+      const Suser = localStorage.getItem("user");
+      if (Suser) {
+        setUser(JSON.parse(Suser));      
+      }
+    }, []);
+  //follow
+  const handleFollow = async () => {
+  try {
+    const action = isFollowed ? "unfollow" : "follow";
+    const formData = new FormData();
+    formData.append("StoryID", item.StoryID);
+    formData.append("action", action);
+    formData.append("UserID",userID.UserID);
+    const res = await axios.post(
+      "http://localhost/Website-Truyen/Api/Story/Follow.php",
+      formData,
+      { withCredentials: true } 
+    );
+    if (res.data.success) {
+      setIsFollowed(!isFollowed);          
+    }
+  } catch (err) {
+    console.error("Lỗi theo dõi:", err);
+  }
+};
+//Like
+  const handleLike = async () => {
+  try {
+    if (!liked) {
+      await axios.post("http://localhost/Website-Truyen/Api/Story/AddLike.php", {
+        userID,
+        storyID: item.StoryID,
+      });
+      setLiked(true);
+    } else {
+      await axios.post("http://localhost/Website-Truyen/Api/Story/RemoveLike.php", {
+        userID,
+        storyID: item.StoryID,
+      });
+      setLiked(false);
+    }
+  } catch (error) {
+    console.error("Lỗi Like/Unlike:", error);
+  }
+};
+//comment
   const handleAddComment = (e) => {
     const comment = e.target.value;
     if (comment.trim() === "") return;
@@ -25,7 +77,7 @@ const Detail = () => {
     setComments([newComment, ...comments]);
     setComment("");
   };
-
+//data story
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -39,7 +91,8 @@ const Detail = () => {
         
         setLoanding(false);
         console.log(response);
-        console.log("chap",res1)
+        console.log("chap",res1);
+        console.log("UserID:", userID);
       } catch (error) {
         setError(error.message);
         setLoanding(false);
@@ -47,8 +100,10 @@ const Detail = () => {
     };
     fetchData();
   }, [StoryID]);
+  
   if (loading) return <p>Loading... </p>;
   if (error) return <p>Error: {error}</p>;
+  
 
   return (
     <div>
@@ -67,15 +122,19 @@ const Detail = () => {
 
             <div className="flex justify-around text-center mt-4">
               <div>
-                <p className="text-xl font-bold">15</p>
+                <p className="text-xl font-bold">{chapter.data.length}</p>
                 <p className="text-xs text-gray-400">Chap</p>
               </div>
               <div>
-                <p className="text-xl font-bold">14.783</p>
+                <p className="text-xl font-bold">{item.view}</p>
                 <p className="text-xs text-gray-400">Lượt xem</p>
               </div>
               <div>
-                <p className="text-xl font-bold">225</p>
+                <p className="text-xl font-bold">{item.Favourite}</p>
+                <p className="text-xs text-gray-400">Lượt thích</p>
+              </div>
+              <div>
+                <p className="text-xl font-bold">{item.Follow}</p>
                 <p className="text-xs text-gray-400">Theo dõi</p>
               </div>
             </div>
@@ -86,13 +145,27 @@ const Detail = () => {
             </div>
 
             <div className="flex flex-col gap-2 mt-4">
-              <button className="w-full py-2 bg-indigo-600 rounded-lg hover:bg-indigo-700">
-                Theo Dõi
-              </button>
-              <button className="w-full py-2 bg-yellow-600 rounded-lg hover:bg-yellow-700">
-                Like
-              </button>
-              <button className="w-full py-2 bg-gray-700 rounded-lg hover:bg-gray-600">
+              <button
+         onClick={handleFollow}
+          className={`w-full py-2 bg-indigo-600 rounded-lg hover:bg-indigo-700 ${
+           isFollowed ? "bg-green-600 hover:bg-green-700" : "bg-indigo-600 hover:bg-indigo-700"
+           }`}
+             >
+           {isFollowed ? "Đang Theo Dõi ✔" : "Theo Dõi"}
+           </button>
+              <button
+            onClick={handleLike}
+            className={`w-full py-2 bg-yellow-600 rounded-lg hover:bg-yellow-700 ${
+              liked ? "bg-red-600 text-white" : "bg-yellow-600 text-black"
+            }`}
+            >
+         {liked ? "💔 Unlike" : "👍 Like"}
+         </button>
+              <button className="w-full py-2 bg-gray-700 rounded-lg hover:bg-gray-600"
+              onClick={() =>
+               navigate(`/read/${firstChapter.ChapterID}?story=${item.StoryID}&storyname=${item.StoryName}`)
+               }
+              >
                 Đọc Từ Đầu
               </button>
             </div>
@@ -152,9 +225,9 @@ const Detail = () => {
                                Chương: {chapList.ChapterNumber}
                               </div>
                               <div className="flex items-center gap-2 text-sm">
-                                <span className="text-red-500">👁️</span>#
+                                <span className="text-red-500">👁️</span>
                                 {chapList.view}
-                                <span className="text-red-500">⏰</span>#
+                                <span className="text-red-500">⏰</span>
                                 {chapList.PublishedDate}
                               </div>
                             </Link>
