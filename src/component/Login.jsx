@@ -29,17 +29,16 @@ const Login = () => {
       if (isLogin) {
         if (data.success) {
           localStorage.setItem("user", JSON.stringify(data.user));
-          alert("Đăng nhập thành công!");         
-          if(data.user.Role==0){
-            window.location.href ="/admin";
-          }else{
-          window.location.href = "/"; }
+          alert("Đăng nhập thành công!");
+          if (data.user.Role == 0) {
+            window.location.href = "/admin";
+          } else {
+            window.location.href = "/";
+          }
         } else {
           alert(data.message || "Sai tài khoản hoặc mật khẩu!");
         }
-      }
-      // Nếu đăng ký
-      else {
+      } else {
         if (data.success) {
           alert("Đăng ký thành công! Hãy đăng nhập.");
           setIsLogin(true);
@@ -54,61 +53,70 @@ const Login = () => {
   };
   return (
     <div
-      className="grid w-full h-screen place-items-center"
+      className="min-h-screen grid place-items-center px-4 py-8 bg-black bg-cover bg-center"
       style={{ backgroundImage: "url('/src/assets/bg-login3.jpg')" }}
     >
-      <div className="w-[430px] bg-white p-8 rounded-2xl shadow-lg">
+      <div className="w-full max-w-md sm:max-w-sm md:max-w-md bg-white/95 p-6 sm:p-8 rounded-2xl shadow-xl">
         <div className="flex justify-center mb-4">
-          <h2 className="text-3xl font-semibold text-center">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-center">
             {isLogin ? "Đăng nhập" : "Đăng ký"}
           </h2>
         </div>
 
-        <div className="relative flex h-12 mb-6 border border-gray-300 rounded-full overflow-hidden">
-          <button
-            onClick={() => setIsLogin(true)}
-            className={`w-1/2 text-lg font-medium transition-all z-10  ${
-              isLogin ? "text-white" : "text-black"
-            }`}
-          >
-            Đăng nhập
-          </button>
-          <button
-            onClick={() => setIsLogin(false)}
-            className={`w-1/2 text-lg font-medium transition-all z-10 ${
-              !isLogin ? "text-white" : "text-black"
-            }`}
-          >
-            Đăng kí
-          </button>
+        {/* toggle - sliding pill covers full text; text centered */}
+        <div className="relative mb-6 rounded-full bg-gray-100/60 p-1">
+          {/* sliding pill */}
           <div
-            className={`absolute top-0 h-full w-1/2 rounded-full bg-linear-to-r from-pink-600 via-pink-500 to-pink-200 ${
-              isLogin ? "left-0" : "left-1/2"
-            } `}
-          ></div>
+            className={`absolute inset-y-1 left-1 w-1/2 bg-linear-to-r from-pink-600 via-pink-500 to-pink-300 rounded-full transition-transform duration-300 ease-in-out ${
+              isLogin ? "translate-x-0" : "translate-x-full"
+            }`}
+            aria-hidden="true"
+          />
+          <div className="relative z-10 grid grid-cols-2 gap-0">
+            <button
+              type="button"
+              onClick={() => setIsLogin(true)}
+              className={`h-10 flex items-center justify-center w-full rounded-full text-sm sm:text-base font-medium transition-colors ${
+                isLogin ? "text-white" : "text-gray-800"
+              }`}
+            >
+              Đăng nhập
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsLogin(false)}
+              className={`h-10 flex items-center justify-center w-full rounded-full text-sm sm:text-base font-medium transition-colors ${
+                !isLogin ? "text-white" : "text-gray-800"
+              }`}
+            >
+              Đăng kí
+            </button>
+          </div>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>        
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Enter your name"
-              required
-              className="w-full p-3 border-b-2 border-gray-300 outline-none focus:via-pink-500 placeholder-gray-400"
-            />        
-          {!isLogin &&(
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <input
-            type="email"
-            name="email"
-            value={formData.email}
+            type="text"
+            name="name"
+            value={formData.name}
             onChange={handleChange}
-            placeholder="Email address"
+            placeholder="Tên của bạn"
             required
-            className="w-full p-3 border-b-2 border-gray-300 outline-none focus:via-pink-500 placeholder-gray-400"
+            className="w-full p-3 text-sm sm:text-base border-b-2 border-gray-200 bg-transparent outline-none placeholder-gray-400"
           />
+
+          {!isLogin && (
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Email address"
+              required
+              className="w-full p-3 text-sm sm:text-base border-b-2 border-gray-200 bg-transparent outline-none placeholder-gray-400"
+            />
           )}
+
           <input
             type="password"
             name="password"
@@ -116,8 +124,9 @@ const Login = () => {
             onChange={handleChange}
             placeholder="Password"
             required
-            className="w-full p-3 border-b-2 border-gray-300 outline-none focus:via-pink-500 placeholder-gray-400"
+            className="w-full p-3 text-sm sm:text-base border-b-2 border-gray-200 bg-transparent outline-none placeholder-gray-400"
           />
+
           {!isLogin && (
             <input
               type="password"
@@ -126,29 +135,31 @@ const Login = () => {
               onChange={handleChange}
               placeholder="Confirm your password"
               required
-              className="w-full p-3 border-b-2 border-gray-300 outline-none focus:via-pink-500 placeholder-gray-400"
+              className="w-full p-3 text-sm sm:text-base border-b-2 border-gray-200 bg-transparent outline-none placeholder-gray-400"
             />
           )}
 
           {isLogin && (
             <div className="text-right">
-              <p className="text-pink-600 hover:underline">Quên mật khẩu?</p>
+              <p className="text-pink-600 hover:underline text-sm">
+                Quên mật khẩu?
+              </p>
             </div>
           )}
 
-          <button className="w-full p-3 bg-linear-to-r from-pink-600 via-pink-500 to-pink-200 text-white rounded-full text-lg font-medium hover:opacity-90 transition">
+          <button className="w-full p-3 mt-2 bg-linear-to-r from-pink-600 via-pink-500 to-pink-300 text-white rounded-full text-base sm:text-lg font-medium hover:opacity-95 transition">
             {isLogin ? "Đăng nhập" : "Đăng ký"}
           </button>
 
-          <p className="text-center text-gray-600">
-            {isLogin ? "Chưa có tài khoản? " : "Đã có tài khoản "}
-            <a
-              href="#"
+          <p className="text-center text-gray-600 text-sm sm:text-base">
+            {isLogin ? "Chưa có tài khoản? " : "Đã có tài khoản? "}
+            <button
+              type="button"
               onClick={() => setIsLogin(!isLogin)}
               className="text-pink-600 hover:underline"
             >
               {isLogin ? "Đăng ký" : "Đăng nhập"}
-            </a>
+            </button>
           </p>
         </form>
       </div>
