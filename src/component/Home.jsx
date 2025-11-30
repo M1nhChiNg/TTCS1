@@ -33,9 +33,9 @@ const Home = () => {
     <div className="bg-black pb-10">
       <Header></Header>
       <Banner></Banner>
-      <div className="text-white p-10 mb-10">
+      <div className="text-white px-10 py-10 mb-10">
         <h2 className="uppercase text-xl mb-4">Truyện Mới Cập Nhật </h2>
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-4 justify-start">
           {items &&
             items.length > 0 &&
             items.map((item) => {

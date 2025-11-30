@@ -46,10 +46,18 @@ const Admin = () => {
   };
 
   const openEdit = (story) => {
-    setForm(story);
-    setIsEditing(true);
-    setModalOpen(true);
-  };
+  setForm({
+    storyID: story.StoryID,
+    storyName: story.StoryName,
+    author: story.AuthorName,
+    category: story.CategoryName,
+    descrition: story.Descrition,
+    img: story.Img,
+  });
+  setIsEditing(true);
+  setModalOpen(true);
+};
+
 
   const handleDelete = async (id) => {
     if (!confirm("Bạn có chắc muốn xóa truyện này?")) return;
@@ -73,7 +81,7 @@ const Admin = () => {
       if (isEditing) {
         await axios.post('http://localhost/Website-Truyen/Api/UpdateStory.php', form);
         setStories((s) =>
-          s.map((st) => (st.id === form.id ? { ...form } : st))
+          s.map((st) => (st.StoryID === form.storyID ? { ...form } : st))
         );
         alert("Cập nhật thành công");
       } else {
@@ -114,22 +122,28 @@ const Admin = () => {
   };
 
   const openEditChapter = (ch) => {
-    setChapterForm(ch);
+    setChapterForm({
+  chapterID: ch.ChapterID,
+  chapterNumber: ch.ChapterNumber,
+  content: ch.Content,
+   });
     setIsEditingChapter(true);
   };
 
-  const handleDeleteChapter = (chapterId) => {
+  const handleDeleteChapter = async (chapterId) => {
     if (!confirm("Xóa chương này?")) return;
     setStories((prev) =>
       prev.map((s) =>
-        s.id === activeStoryId
+        s.StoryID === activeStoryId
           ? { ...s, chapters: s.chapters.filter((c) => c.ChapterID !== chapterId) }
           : s
       )
     );
+    await axios.post('http://localhost/Website-Truyen/Api/DeleteChapter.php', { id: chapterId });
+    alert("Đã xóa chương");
   };
 
-  const handleChapterSubmit = (e) => {
+  const handleChapterSubmit = async (e) => {
     e.preventDefault();
     if (!chapterForm.chapterNumber.trim()) {
       alert("Vui lòng nhập số chương");
@@ -138,32 +152,20 @@ const Admin = () => {
     setLoadingChapter(true);
     try {
       if (isEditingChapter) {
-        // update
-        setStories((prev) =>
-          prev.map((s) =>
-            s.chapters.ChapterID === activeStoryId
-              ? {
-                  ...s,
-                  chapters: s.chapters.map((c) =>
-                    c.ChapterID === chapterForm.chapterID ? { ...chapterForm } : c
-                  ),
-                }
-              : s
-          )
-        );
-        alert("Cập nhật chương thành công");
-      } else {
-        // create
-        const newCh = { ...chapterForm };
-        setStories((prev) =>
-          prev.map((s) =>
-            s.StoryID === activeStoryId
-              ? { ...s, chapters: [newCh, ...(s.chapters || [])] }
-              : s
-          )
-        );
-        alert("Thêm chương thành công");
-      }
+  await axios.post('http://localhost/Website-Truyen/Api/UpdateChapter.php', {
+    chapterID: chapterForm.chapterID,
+    chapterNumber: chapterForm.chapterNumber,
+    content: chapterForm.content,
+  });
+  alert("Cập nhật chương thành công");
+} else {
+  await axios.post('http://localhost/Website-Truyen/Api/AddChapter.php', {
+    storyID: activeStoryId,
+    chapterNumber: chapterForm.chapterNumber,
+    content: chapterForm.content,
+  });
+  alert("Thêm chương thành công");
+}
       setChapterForm(emptyChapter);
       setIsEditingChapter(false);
     } catch (err) {
@@ -293,9 +295,6 @@ const Admin = () => {
                 onChange={(e) => setForm({ ...form, img: e.target.value })}
                 className="w-full mb-3 px-3 py-2 border rounded"
               />
-              
-              
-
               <label className="block mb-2 text-sm">Mô tả</label>
               <textarea
                 value={form.descrition||""}
@@ -364,9 +363,9 @@ const Admin = () => {
                         className="p-2 border-b last:border-b-0 flex justify-between items-start gap-2"
                       >
                         <div>
-                          <div className="font-medium">{ch.StoryName}</div>
+                          <div className="font-medium">{ch.ChapterNumber}</div>
                           <div className="text-sm text-gray-600 line-clamp-3">
-                            {ch.content}
+                            {ch.Content}
                           </div>
                         </div>
                         <div className="flex flex-col gap-1">
@@ -394,18 +393,18 @@ const Admin = () => {
                   </h3>
                   <form onSubmit={handleChapterSubmit} className="space-y-3">
                     <input
-                      value={chapterForm.chapterNumber||"0"}
+                      value={chapterForm.chapterNumber||""}
                       onChange={(e) =>
                         setChapterForm({
                           ...chapterForm,
-                          title: e.target.value,
+                          chapterNumber: e.target.value,
                         })
                       }
                       className="w-full px-3 py-2 border rounded"
                       placeholder="Tiêu đề chapter"
                     />
                     <textarea
-                      value={chapterForm.content||"trống"}
+                      value={chapterForm.content||""}
                       onChange={(e) =>
                         setChapterForm({
                           ...chapterForm,

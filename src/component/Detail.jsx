@@ -1,82 +1,40 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Helmet } from "react-helmet";
 import Header from "./includes/Header";
 import Footer from "./includes/Footer";
 import { Link, useNavigate } from "react-router-dom";
+import CommentSection from "../component/CommentSection";
+import LikeButton from "../component/LikeButton";
+import FollowButton from "../component/FollowButton";
 const Detail = () => {
   const { StoryID } = useParams();
   const [data, setData] = useState([]);
   const [chapter, setChapter] = useState([]);
   const [loading, setLoanding] = useState(true);
   const [error, setError] = useState(null);
-  const [comment, setComment] = useState("");
-  const [comments, setComments] = useState([]);
   const navigate = useNavigate();
-  const [liked, setLiked] = useState(false);
-  const [userID, setUser]= useState(null);
-  const [isFollowed, setIsFollowed] = useState(false);  
+  const [userID, setUser]= useState(); 
   const firstChapter = chapter?.data?.[0];
   const item = data?.data;
+  useEffect(() => {
+    // Khi component mount, tạo timeout 10 giây
+    const timer = setTimeout(() => {
+      axios.post("http://localhost/Website-Truyen/Api/Story/IncreaseView.php", {
+        storyID: StoryID
+      })
+      .then(res => console.log("View tăng", res.data))
+      .catch(err => console.error("Lỗi tăng view", err));
+    }, 10000);
+    // Nếu user rời trang trước 10s, cancel timeout
+    return () => clearTimeout(timer);
+  }, [StoryID]);
   useEffect(() => {
       const Suser = localStorage.getItem("user");
       if (Suser) {
         setUser(JSON.parse(Suser));      
       }
-    }, []);
-  //follow
-  const handleFollow = async () => {
-  try {
-    const action = isFollowed ? "unfollow" : "follow";
-    const formData = new FormData();
-    formData.append("StoryID", item.StoryID);
-    formData.append("action", action);
-    formData.append("UserID",userID.UserID);
-    const res = await axios.post(
-      "http://localhost/Website-Truyen/Api/Story/Follow.php",
-      formData,
-      { withCredentials: true } 
-    );
-    if (res.data.success) {
-      setIsFollowed(!isFollowed);          
-    }
-  } catch (err) {
-    console.error("Lỗi theo dõi:", err);
-  }
-};
-//Like
-  const handleLike = async () => {
-  try {
-    if (!liked) {
-      await axios.post("http://localhost/Website-Truyen/Api/Story/AddLike.php", {
-        userID,
-        storyID: item.StoryID,
-      });
-      setLiked(true);
-    } else {
-      await axios.post("http://localhost/Website-Truyen/Api/Story/RemoveLike.php", {
-        userID,
-        storyID: item.StoryID,
-      });
-      setLiked(false);
-    }
-  } catch (error) {
-    console.error("Lỗi Like/Unlike:", error);
-  }
-};
-//comment
-  const handleAddComment = (e) => {
-    const comment = e.target.value;
-    if (comment.trim() === "") return;
-    const newComment = {
-      id: comments.length + 1,
-      name: "Người dùng mới",
-      text: comment,
-    };
-    setComments([newComment, ...comments]);
-    setComment("");
-  };
+    },[]);
 //data story
   useEffect(() => {
     const fetchData = async () => {
@@ -92,7 +50,6 @@ const Detail = () => {
         setLoanding(false);
         console.log(response);
         console.log("chap",res1);
-        console.log("UserID:", userID);
       } catch (error) {
         setError(error.message);
         setLoanding(false);
@@ -103,13 +60,20 @@ const Detail = () => {
   
   if (loading) return <p>Loading... </p>;
   if (error) return <p>Error: {error}</p>;
-  
+function timeAgo(datetime) {
+  const now = new Date();
+  const past = new Date(datetime);
+  const diff = Math.floor((now - past) / 1000); // giây
 
+  if (diff < 60) return "Vừa xong";
+  if (diff < 3600) return Math.floor(diff / 60) + " phút trước";
+  if (diff < 86400) return Math.floor(diff / 3600) + " giờ trước";
+  if (diff < 2592000) return Math.floor(diff / 86400) + " ngày trước";
+  if (diff < 31104000) return Math.floor(diff / 2592000) + " tháng trước";
+  return Math.floor(diff / 31104000) + " năm trước";
+}
   return (
     <div>
-     {/* <Helmet>
-        <title>{data.data.seoOnPage.titleHead}</title>
-      </Helmet>*/}
       <Header></Header>
       <div className="min-h-screen bg-[#1a1b1f] text-gray-200 p-4">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8">
@@ -145,22 +109,8 @@ const Detail = () => {
             </div>
 
             <div className="flex flex-col gap-2 mt-4">
-              <button
-         onClick={handleFollow}
-          className={`w-full py-2 bg-indigo-600 rounded-lg hover:bg-indigo-700 ${
-           isFollowed ? "bg-green-600 hover:bg-green-700" : "bg-indigo-600 hover:bg-indigo-700"
-           }`}
-             >
-           {isFollowed ? "Đang Theo Dõi ✔" : "Theo Dõi"}
-           </button>
-              <button
-            onClick={handleLike}
-            className={`w-full py-2 bg-yellow-600 rounded-lg hover:bg-yellow-700 ${
-              liked ? "bg-red-600 text-white" : "bg-yellow-600 text-black"
-            }`}
-            >
-         {liked ? "💔 Unlike" : "👍 Like"}
-         </button>
+              <FollowButton storyID={StoryID} />
+              <LikeButton storyID={StoryID} />
               <button className="w-full py-2 bg-gray-700 rounded-lg hover:bg-gray-600"
               onClick={() =>
                navigate(`/read/${firstChapter.ChapterID}?story=${item.StoryID}&storyname=${item.StoryName}`)
@@ -228,7 +178,7 @@ const Detail = () => {
                                 <span className="text-red-500">👁️</span>
                                 {chapList.view}
                                 <span className="text-red-500">⏰</span>
-                                {chapList.PublishedDate}
+                                {timeAgo(chapList.PublishedDate)}
                               </div>
                             </Link>
                           ))
@@ -244,36 +194,7 @@ const Detail = () => {
             </div>
           </div>
         </div>
-        <div className="bg-gray-900 p-4 rounded-xl max-w-4xl mx-auto mt-4">
-          <h3 className="text-xl font-bold mb-3">BÌNH LUẬN</h3>
-          <div className="flex gap-2 mb-4">
-            <input
-              type="text"
-              placeholder="Nhập bình luận..."
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              className="flex-1 p-2 rounded-lg text-white outline-none  bg-gray-800"
-            />
-            <button
-              onClick={handleAddComment}
-              className="bg-red-600 hover:bg-red-500 px-4 rounded-lg cursor-pointer"
-            >
-              GỬI
-            </button>
-          </div>
-
-          <div className="space-y-3">
-            {comments.map((c) => (
-              <div
-                key={c.id}
-                className="bg-gray-800 p-3 rounded-lg text-sm flex flex-col"
-              >
-                <span className="text-red-400 font-semibold">{c.name} </span>
-                <p className="text-gray-200 mt-1">{c.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+         <CommentSection storyID={StoryID} />
       </div>
       <Footer></Footer>
     </div>

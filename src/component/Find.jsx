@@ -59,13 +59,13 @@ const Find = () => {
     
     <div className="bg-black pb-10">
       <Header></Header>
-      <h1 className="text-2xl font-bold text-center mb-6 text-white">📚 Danh sách truyện</h1>
+      <h1 className="text-2xl font-bold text-center mb-6 text-white">Danh sách truyện</h1>
 
       {/* Danh sách tác giả & thể loại */}
       <div className="grid grid-cols-2 gap-6 mb-10 text-white">
         {/* Cột trái: tác giả */}
         <div>
-          <h2 className="text-xl font-semibold mb-3 text-center">✍️ Tác giả</h2>
+          <h2 className="text-xl font-semibold mb-3 text-center">Tác giả</h2>
           <div className="grid grid-cols-3 gap-3">
             {authors.map((author) => (
               <button
@@ -85,7 +85,7 @@ const Find = () => {
 
         {/* Cột phải: thể loại */}
         <div>
-          <h2 className="text-xl font-semibold mb-3 text-center">🏷️ Thể loại</h2>
+          <h2 className="text-xl font-semibold mb-3 text-center">Thể loại</h2>
           <div className="grid grid-cols-3 gap-3">
             {categories.map((cat) => (
               <button

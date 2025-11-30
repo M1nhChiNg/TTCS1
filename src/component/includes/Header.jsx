@@ -22,9 +22,7 @@ const Header = () => {
   const handleSearch = async () => {
     try {
       const response = await fetch(
-        `http://localhost/Website-Truyen/Api/Home/SearchStory.php?keyword=${encodeURIComponent(
-          keyword
-        )}`
+        `http://localhost/Website-Truyen/Api/Home/SearchStory.php?keyword=${encodeURIComponent(keyword)}`
       );
       const data = await response.json();
       setResults(data);
@@ -36,10 +34,7 @@ const Header = () => {
   // Ẩn dropdown khi click ra ngoài
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
         setShowDropdown(false);
       }
     };
@@ -61,11 +56,6 @@ const Header = () => {
           <Link to="/find" className="text-white">
             Danh sách
           </Link>
-          {user && user.Role == 0 ? (
-            <Link to="/admin" className="text-white">
-              Quản lý
-            </Link>
-          ) : null}
           {/*<a href="#" className="text-white">
             Tác giả
           </a>*/}
@@ -88,33 +78,31 @@ const Header = () => {
           Tìm kiếm
         </button>
         {showDropdown && results.length > 0 ? (
-          <div className="absolute top-full left-0 w-full bg-white text-black mt-1 rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
-            {results.map((item) => (
-              <div
-                key={item.StoryID}
-                className="flex items-center p-2 hover:bg-gray-200 cursor-pointer"
-              >
-                <img
-                  src={`http://localhost/Website-Truyen/Assets/Img/${item.Img}`}
-                  alt={item.StoryName}
-                  className="w-12 h-16 object-cover rounded mr-2"
-                />
-                <div>
-                  {/* 👉 Chỉ bấm vào đây mới điều hướng */}
-                  <Link
-                    to={`/comics/${item.StoryID}`}
-                    className="font-bold text-blue-600 hover:none"
-                    onClick={() => setShowDropdown(false)}
-                  >
-                    {item.StoryName}
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <span>Không tìm thấy truyện.</span>
-        )}
+  <div className="absolute top-full left-0 w-full bg-white text-black mt-1 rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
+    {results.map((item) => (
+      <div
+        key={item.StoryID}
+        className="flex items-center p-2 hover:bg-gray-200 cursor-pointer"
+      >
+        <img
+          src={`http://localhost/Website-Truyen/Assets/Img/${item.Img}`}
+          alt={item.StoryName}
+          className="w-12 h-16 object-cover rounded mr-2"
+        />
+        <div>
+          {/* 👉 Chỉ bấm vào đây mới điều hướng */}
+          <Link
+            to={`/comics/${item.StoryID}`}
+            className="font-bold text-blue-600 hover:none"
+            onClick={() => setShowDropdown(false)}
+          >
+            {item.StoryName}
+          </Link>
+        </div>
+      </div>))}
+    
+  </div>) : (<span>Không tìm thấy truyện.</span>)}
+
       </div>
       <div className="flex items-center space-x-4">
         {user ? (
@@ -124,7 +112,7 @@ const Header = () => {
               onClick={handleLogout}
               className="bg-red-600 hover:bg-red-700 rounded-3xl px-3 py-2 font-bold transition"
             >
-              Đăng xuất
+              Đăng xuất 
             </button>
           </div>
         ) : (
@@ -135,7 +123,14 @@ const Header = () => {
             Đăng nhập
           </Link>
         )}
-      </div>
+      
+      
+      {user && user.Role == 0 && (
+            <Link to="/admin" className="bg-red-600 hover:bg-red-700 rounded-3xl px-3 py-2 font-bold transition text-white">
+              Quản lý
+            </Link>
+          ) }
+          </div>
     </div>
   );
 };
