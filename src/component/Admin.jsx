@@ -33,6 +33,16 @@ const Admin = () => {
   const [isEditingChapter, setIsEditingChapter] = useState(false);
   const [loadingChapter, setLoadingChapter] = useState(false);
 
+  // user modal state (added)
+  const [userModalOpen, setUserModalOpen] = useState(false);
+  const [userForm, setUserForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "1",
+  });
+  const [loadingUser, setLoadingUser] = useState(false);
+
   useEffect(() => {
     axios
       .get("http://localhost/Website-Truyen/Api/StoryDetail.php")
@@ -209,6 +219,45 @@ const Admin = () => {
     }
   };
 
+  // open add user
+  const openAddUser = () => {
+    setUserForm({ name: "", email: "", password: "", role: "1" });
+    setUserModalOpen(true);
+  };
+
+  const handleUserChange = (e) =>
+    setUserForm({ ...userForm, [e.target.name]: e.target.value });
+
+  const handleUserSubmit = async (e) => {
+    e.preventDefault();
+    if (!userForm.name.trim() || !userForm.email.trim() || !userForm.password) {
+      alert("Vui lòng điền đầy đủ thông tin");
+      return;
+    }
+    setLoadingUser(true);
+    try {
+      const res = await axios.post(
+        "http://localhost/Website-Truyen/Api/AddUser.php",
+        userForm
+      );
+      // try to read created user from response, fallback to minimal
+      const created = res.data?.data ?? {
+        UserID: Date.now(),
+        UserName: userForm.name,
+        Email: userForm.email,
+        Role: userForm.role,
+      };
+      setUsers((u) => [created, ...u]);
+      alert("Thêm người dùng thành công");
+      setUserModalOpen(false);
+    } catch (err) {
+      console.error(err);
+      alert("Lỗi khi thêm người dùng");
+    } finally {
+      setLoadingUser(false);
+    }
+  };
+
   return (
     <div className=" min-h-screen bg-gray-100 flex flex-col">
       <Header></Header>
@@ -218,7 +267,7 @@ const Admin = () => {
             <button
               onClick={() => setTab("story")}
               className={`px-4 py-2 rounded-md ${
-                tab === "story" ? "bg-pink-600 text-white" : "bg-gray-200"
+                tab === "story" ? "bg-black text-white" : "bg-gray-200"
               }`}
             >
               Quản lý truyện
@@ -226,7 +275,7 @@ const Admin = () => {
             <button
               onClick={() => setTab("user")}
               className={`px-4 py-2 rounded-md ${
-                tab === "user" ? "bg-pink-600 text-white" : "bg-gray-200"
+                tab === "user" ? "bg-black text-white" : "bg-gray-200"
               }`}
             >
               Quản lý người dùng
@@ -254,10 +303,10 @@ const Admin = () => {
                   <th className="px-4 py-3 text-left text-sm font-medium">
                     Thể Loại
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">
+                  <th className="px-4 py-3 text-center text-sm font-medium">
                     Mô tả
                   </th>
-                  <th className="px-4 py-3 text-right text-sm font-medium">
+                  <th className="px-4 py-3 text-center text-sm font-medium">
                     Hành động
                   </th>
                 </tr>
@@ -276,12 +325,15 @@ const Admin = () => {
                 {stories.map((s) => (
                   <tr key={s.StoryID} className="border-t">
                     <td className="px-4 py-3">{s.StoryName}</td>
-                    <td className="px-4 py-3">{s.AuthorName}</td>
+                    <td className="px-4 py-3">
+                      {" "}
+                      {s.AuthorName || "Đang cập nhật"}{" "}
+                    </td>
                     <td className="px-4 py-3">{s.CategoryName}</td>
                     <td className="px-4 py-3 text-sm text-gray-600">
                       {s.Descrition}
                     </td>
-                    <td className="px-4 py-3 text-right space-x-2">
+                    <td className="px-4 py-3 text-center space-x-2 space-y-1.5">
                       <button
                         onClick={() => openEdit(s)}
                         className="px-3 py-1 bg-yellow-400 text-black rounded hover:opacity-90"
@@ -529,8 +581,10 @@ const Admin = () => {
                   <tr key={u.UserID} className="border-t">
                     <td className="px-4 py-3">{u.UserName}</td>
                     <td className="px-4 py-3">{u.Email}</td>
-                    <td className="px-4 py-3">{u.Role}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3">
+                      {u.Role === 0 || u.Role === "0" ? "Admin" : "User"}
+                    </td>
+                    <td className="px-4 py-3 text-center">
                       <button
                         onClick={() => handleDeleteUser(u.UserID)}
                         className="px-3 py-1 bg-red-500 text-white rounded hover:opacity-90"
@@ -542,6 +596,88 @@ const Admin = () => {
                 ))}
               </tbody>
             </table>
+
+            {/* Thêm button bên dưới bảng */}
+            <div className="p-4 border-t flex justify-center">
+              <button
+                onClick={openAddUser}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:opacity-90"
+              >
+                Thêm người dùng
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* User Modal (thêm người dùng) */}
+        {userModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <form
+              onSubmit={handleUserSubmit}
+              className="w-full max-w-md bg-white rounded-lg p-6 shadow-lg"
+            >
+              <h2 className="text-lg font-medium mb-4">Thêm người dùng</h2>
+
+              <label className="block mb-2 text-sm">Tên</label>
+              <input
+                name="name"
+                value={userForm.name}
+                onChange={handleUserChange}
+                className="w-full mb-3 px-3 py-2 border rounded"
+                placeholder="Tên người dùng"
+                required
+              />
+
+              <label className="block mb-2 text-sm">Email</label>
+              <input
+                name="email"
+                type="email"
+                value={userForm.email}
+                onChange={handleUserChange}
+                className="w-full mb-3 px-3 py-2 border rounded"
+                placeholder="Email"
+                required
+              />
+
+              <label className="block mb-2 text-sm">Mật khẩu</label>
+              <input
+                name="password"
+                type="password"
+                value={userForm.password}
+                onChange={handleUserChange}
+                className="w-full mb-3 px-3 py-2 border rounded"
+                placeholder="Mật khẩu"
+                required
+              />
+
+              <label className="block mb-2 text-sm">Role</label>
+              <select
+                name="role"
+                value={userForm.role}
+                onChange={handleUserChange}
+                className="w-full mb-4 px-3 py-2 border rounded"
+              >
+                <option value="1">User</option>
+                <option value="0">Admin</option>
+              </select>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setUserModalOpen(false)}
+                  className="px-4 py-2 border rounded"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={loadingUser}
+                  className="px-4 py-2 bg-pink-600 text-white rounded hover:opacity-90"
+                >
+                  Thêm
+                </button>
+              </div>
+            </form>
           </div>
         )}
       </div>
