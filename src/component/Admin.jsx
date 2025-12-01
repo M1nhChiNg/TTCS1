@@ -24,7 +24,8 @@ const Admin = () => {
   const [form, setForm] = useState(emptyForm);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [tab, setTab] = useState("story"); 
+  const [users, setUsers] = useState([]);
   // chapter modal state
   const [chaptersOpen, setChaptersOpen] = useState(false);
   const [activeStoryId, setActiveStoryId] = useState(null);
@@ -33,12 +34,16 @@ const Admin = () => {
   const [loadingChapter, setLoadingChapter] = useState(false);
 
   useEffect(() => {
-    // TODO: Thay bằng API
     axios
         .get("http://localhost/Website-Truyen/Api/StoryDetail.php" )
         .then((res1) => setStories(res1.data))
         .catch((err) => console.error(err));
+    axios
+        .get("http://localhost/Website-Truyen/Api/GetUser.php")
+        .then((res2) => setUsers(res2.data))
+        .catch((err) => console.error(err));
   },[]);
+
   const openAdd = () => {
     setForm(emptyForm);
     setIsEditing(false);
@@ -175,21 +180,46 @@ const Admin = () => {
       setLoadingChapter(false);
     }
   };
+const handleDeleteUser = async (id) => {
+  if (!confirm("Bạn có chắc muốn xóa người dùng này?")) return;
+  try {
+    await axios.post("http://localhost/Website-Truyen/Api/DeleteUser.php", { id });
+    setUsers((prev) => prev.filter((u) => u.UserID !== id));
+    alert("Đã xóa người dùng");
+  } catch (err) {
+    console.error(err);
+    alert("Lỗi khi xóa user");
+  }
+};
 
   return (
     <div className=" min-h-screen bg-gray-100 flex flex-col">
       <Header></Header>
       <div className="flex-1 max-w-5xl mx-auto mt-10 ">
         <header className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold">Admin - Quản lý truyện</h1>
-          <button
-            onClick={openAdd}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:opacity-90"
-          >
-            Thêm truyện
-          </button>
-        </header>
+  <div className="flex gap-4">
+    <button
+      onClick={() => setTab("story")}
+      className={`px-4 py-2 rounded-md ${tab === "story" ? "bg-pink-600 text-white" : "bg-gray-200"}`}
+    >
+      Quản lý truyện
+    </button>
+    <button
+      onClick={() => setTab("user")}
+      className={`px-4 py-2 rounded-md ${tab === "user" ? "bg-pink-600 text-white" : "bg-gray-200"}`}
+    >
+      Quản lý người dùng
+    </button>
+  </div>
+    <button
+      onClick={openAdd}
+      className="px-4 py-2 bg-green-600 text-white rounded-md hover:opacity-90"
+    >
+      Thêm truyện
+    </button> 
+</header>
 
+{tab === "story" && (
         <div className="bg-white rounded-lg shadow overflow-x-auto">
           <table className="min-w-full">
             <thead className="bg-gray-50">
@@ -254,7 +284,7 @@ const Admin = () => {
               ))}
             </tbody>
           </table>
-        </div>
+        </div>)}
 
         {/* Story Modal */}
         {modalOpen && (
@@ -441,6 +471,45 @@ const Admin = () => {
           </div>
         )}
       </div>
+      {tab === "user" && (
+  <div className="bg-white rounded-lg shadow overflow-x-auto">
+    <table className="min-w-full">
+      <thead className="bg-gray-50">
+        <tr>
+          <th className="px-4 py-3 text-left text-sm font-medium">Tên</th>
+          <th className="px-4 py-3 text-left text-sm font-medium">Email</th>
+          <th className="px-4 py-3 text-left text-sm font-medium">Vai trò</th>
+          <th className="px-4 py-3 text-left text-sm font-medium">Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        {users.length === 0 && (
+          <tr>
+            <td colSpan="4" className="px-4 py-6 text-center text-gray-500">
+              Không có người dùng
+            </td>
+          </tr>
+        )}
+        {users.map((u) => (
+          <tr key={u.UserID} className="border-t">
+            <td className="px-4 py-3">{u.UserName}</td>
+            <td className="px-4 py-3">{u.Email}</td>
+            <td className="px-4 py-3">{u.Role}</td>
+            <td className="px-4 py-3 text-right">
+              <button
+                onClick={() => handleDeleteUser(u.UserID)}
+                className="px-3 py-1 bg-red-500 text-white rounded hover:opacity-90"
+              >
+                Xóa
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
       <Footer></Footer>
     </div>
   );

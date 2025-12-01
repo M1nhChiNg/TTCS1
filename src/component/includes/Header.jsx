@@ -108,12 +108,13 @@ const Header = () => {
         {user ? (
           <div className="flex items-center space-x-3 text-white">
             <span>Chào: {user.UserName || "Người dùng"}</span>
-            <button
+            <Link
+            to="/"
               onClick={handleLogout}
               className="bg-red-600 hover:bg-red-700 rounded-3xl px-3 py-2 font-bold transition"
             >
               Đăng xuất 
-            </button>
+            </Link>
           </div>
         ) : (
           <Link

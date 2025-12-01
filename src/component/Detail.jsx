@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import CommentSection from "../component/CommentSection";
 import LikeButton from "../component/LikeButton";
 import FollowButton from "../component/FollowButton";
+import StoryRating from "../component/StoryRating";
 const Detail = () => {
   const { StoryID } = useParams();
   const [data, setData] = useState([]);
@@ -102,10 +103,10 @@ function timeAgo(datetime) {
                 <p className="text-xs text-gray-400">Theo dõi</p>
               </div>
             </div>
-
             <div className="mt-4 text-center">
-              <div className="flex justify-center text-yellow-400">★★★★☆</div>
-              <p className="text-gray-400 text-sm mt-1">4/5</p>
+              {/*<div className="flex justify-center text-yellow-400">★★★★☆</div>
+              <p className="text-gray-400 text-sm mt-1">4/5</p>*/}
+              <StoryRating storyID={StoryID} userID={userID} />
             </div>
 
             <div className="flex flex-col gap-2 mt-4">
@@ -139,7 +140,7 @@ function timeAgo(datetime) {
 
               </div>
               <p className="text-sm leading-relaxed text-gray-300">
-                {item.Decrition}
+                {item.Descrition}
               </p>
               <div>
                 <h2 className="text-lg font-semibold border-b border-gray-700 pb-1 mb-2">
