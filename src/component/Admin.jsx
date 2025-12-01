@@ -4,7 +4,7 @@ import Header from "./includes/Header";
 import Footer from "./includes/Footer";
 
 const emptyForm = {
-  storyID:"",
+  storyID: "",
   storyName: "",
   author: "",
   category: "",
@@ -12,7 +12,7 @@ const emptyForm = {
   descrition: "",
 };
 
-const emptyChapter = { 
+const emptyChapter = {
   chapterID: "",
   chapterNumber: "",
   content: "",
@@ -24,7 +24,7 @@ const Admin = () => {
   const [form, setForm] = useState(emptyForm);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [tab, setTab] = useState("story"); 
+  const [tab, setTab] = useState("story");
   const [users, setUsers] = useState([]);
   // chapter modal state
   const [chaptersOpen, setChaptersOpen] = useState(false);
@@ -35,14 +35,14 @@ const Admin = () => {
 
   useEffect(() => {
     axios
-        .get("http://localhost/Website-Truyen/Api/StoryDetail.php" )
-        .then((res1) => setStories(res1.data))
-        .catch((err) => console.error(err));
+      .get("http://localhost/Website-Truyen/Api/StoryDetail.php")
+      .then((res1) => setStories(res1.data))
+      .catch((err) => console.error(err));
     axios
-        .get("http://localhost/Website-Truyen/Api/GetUser.php")
-        .then((res2) => setUsers(res2.data))
-        .catch((err) => console.error(err));
-  },[]);
+      .get("http://localhost/Website-Truyen/Api/GetUser.php")
+      .then((res2) => setUsers(res2.data))
+      .catch((err) => console.error(err));
+  }, []);
 
   const openAdd = () => {
     setForm(emptyForm);
@@ -51,23 +51,24 @@ const Admin = () => {
   };
 
   const openEdit = (story) => {
-  setForm({
-    storyID: story.StoryID,
-    storyName: story.StoryName,
-    author: story.AuthorName,
-    category: story.CategoryName,
-    descrition: story.Descrition,
-    img: story.Img,
-  });
-  setIsEditing(true);
-  setModalOpen(true);
-};
-
+    setForm({
+      storyID: story.StoryID,
+      storyName: story.StoryName,
+      author: story.AuthorName,
+      category: story.CategoryName,
+      descrition: story.Descrition,
+      img: story.Img,
+    });
+    setIsEditing(true);
+    setModalOpen(true);
+  };
 
   const handleDelete = async (id) => {
     if (!confirm("Bạn có chắc muốn xóa truyện này?")) return;
     try {
-      await axios.post('http://localhost/Website-Truyen/Api/DeleteStory.php', { id });
+      await axios.post("http://localhost/Website-Truyen/Api/DeleteStory.php", {
+        id,
+      });
       setStories((s) => s.filter((x) => x.StoryID !== id));
     } catch (err) {
       console.error(err);
@@ -84,13 +85,19 @@ const Admin = () => {
     setLoading(true);
     try {
       if (isEditing) {
-        await axios.post('http://localhost/Website-Truyen/Api/UpdateStory.php', form);
+        await axios.post(
+          "http://localhost/Website-Truyen/Api/UpdateStory.php",
+          form
+        );
         setStories((s) =>
           s.map((st) => (st.StoryID === form.storyID ? { ...form } : st))
         );
         alert("Cập nhật thành công");
       } else {
-        const res = await axios.post('http://localhost/Website-Truyen/Api/AddStory.php', form);
+        const res = await axios.post(
+          "http://localhost/Website-Truyen/Api/AddStory.php",
+          form
+        );
         const newItem = { ...form, chapters: [] };
         setStories((s) => [newItem, ...s]);
         alert("Thêm truyện thành công");
@@ -128,10 +135,10 @@ const Admin = () => {
 
   const openEditChapter = (ch) => {
     setChapterForm({
-  chapterID: ch.ChapterID,
-  chapterNumber: ch.ChapterNumber,
-  content: ch.Content,
-   });
+      chapterID: ch.ChapterID,
+      chapterNumber: ch.ChapterNumber,
+      content: ch.Content,
+    });
     setIsEditingChapter(true);
   };
 
@@ -140,11 +147,16 @@ const Admin = () => {
     setStories((prev) =>
       prev.map((s) =>
         s.StoryID === activeStoryId
-          ? { ...s, chapters: s.chapters.filter((c) => c.ChapterID !== chapterId) }
+          ? {
+              ...s,
+              chapters: s.chapters.filter((c) => c.ChapterID !== chapterId),
+            }
           : s
       )
     );
-    await axios.post('http://localhost/Website-Truyen/Api/DeleteChapter.php', { id: chapterId });
+    await axios.post("http://localhost/Website-Truyen/Api/DeleteChapter.php", {
+      id: chapterId,
+    });
     alert("Đã xóa chương");
   };
 
@@ -157,20 +169,23 @@ const Admin = () => {
     setLoadingChapter(true);
     try {
       if (isEditingChapter) {
-  await axios.post('http://localhost/Website-Truyen/Api/UpdateChapter.php', {
-    chapterID: chapterForm.chapterID,
-    chapterNumber: chapterForm.chapterNumber,
-    content: chapterForm.content,
-  });
-  alert("Cập nhật chương thành công");
-} else {
-  await axios.post('http://localhost/Website-Truyen/Api/AddChapter.php', {
-    storyID: activeStoryId,
-    chapterNumber: chapterForm.chapterNumber,
-    content: chapterForm.content,
-  });
-  alert("Thêm chương thành công");
-}
+        await axios.post(
+          "http://localhost/Website-Truyen/Api/UpdateChapter.php",
+          {
+            chapterID: chapterForm.chapterID,
+            chapterNumber: chapterForm.chapterNumber,
+            content: chapterForm.content,
+          }
+        );
+        alert("Cập nhật chương thành công");
+      } else {
+        await axios.post("http://localhost/Website-Truyen/Api/AddChapter.php", {
+          storyID: activeStoryId,
+          chapterNumber: chapterForm.chapterNumber,
+          content: chapterForm.content,
+        });
+        alert("Thêm chương thành công");
+      }
       setChapterForm(emptyChapter);
       setIsEditingChapter(false);
     } catch (err) {
@@ -180,111 +195,118 @@ const Admin = () => {
       setLoadingChapter(false);
     }
   };
-const handleDeleteUser = async (id) => {
-  if (!confirm("Bạn có chắc muốn xóa người dùng này?")) return;
-  try {
-    await axios.post("http://localhost/Website-Truyen/Api/DeleteUser.php", { id });
-    setUsers((prev) => prev.filter((u) => u.UserID !== id));
-    alert("Đã xóa người dùng");
-  } catch (err) {
-    console.error(err);
-    alert("Lỗi khi xóa user");
-  }
-};
+  const handleDeleteUser = async (id) => {
+    if (!confirm("Bạn có chắc muốn xóa người dùng này?")) return;
+    try {
+      await axios.post("http://localhost/Website-Truyen/Api/DeleteUser.php", {
+        id,
+      });
+      setUsers((prev) => prev.filter((u) => u.UserID !== id));
+      alert("Đã xóa người dùng");
+    } catch (err) {
+      console.error(err);
+      alert("Lỗi khi xóa user");
+    }
+  };
 
   return (
     <div className=" min-h-screen bg-gray-100 flex flex-col">
       <Header></Header>
       <div className="flex-1 max-w-5xl mx-auto mt-10 ">
         <header className="flex items-center justify-between mb-6">
-  <div className="flex gap-4">
-    <button
-      onClick={() => setTab("story")}
-      className={`px-4 py-2 rounded-md ${tab === "story" ? "bg-pink-600 text-white" : "bg-gray-200"}`}
-    >
-      Quản lý truyện
-    </button>
-    <button
-      onClick={() => setTab("user")}
-      className={`px-4 py-2 rounded-md ${tab === "user" ? "bg-pink-600 text-white" : "bg-gray-200"}`}
-    >
-      Quản lý người dùng
-    </button>
-  </div>
-    <button
-      onClick={openAdd}
-      className="px-4 py-2 bg-green-600 text-white rounded-md hover:opacity-90"
-    >
-      Thêm truyện
-    </button> 
-</header>
+          <div className="flex gap-4">
+            <button
+              onClick={() => setTab("story")}
+              className={`px-4 py-2 rounded-md ${
+                tab === "story" ? "bg-pink-600 text-white" : "bg-gray-200"
+              }`}
+            >
+              Quản lý truyện
+            </button>
+            <button
+              onClick={() => setTab("user")}
+              className={`px-4 py-2 rounded-md ${
+                tab === "user" ? "bg-pink-600 text-white" : "bg-gray-200"
+              }`}
+            >
+              Quản lý người dùng
+            </button>
+          </div>
+          <button
+            onClick={openAdd}
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:opacity-90"
+          >
+            Thêm truyện
+          </button>
+        </header>
 
-{tab === "story" && (
-        <div className="bg-white rounded-lg shadow overflow-x-auto">
-          <table className="min-w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-sm font-medium">
-                  Tiêu đề
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium">
-                  Tác giả
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium">
-                  Thể Loại
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium">
-                  Mô tả
-                </th>
-                <th className="px-4 py-3 text-right text-sm font-medium">
-                  Hành động
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {stories.length === 0 && (
-                <tr key="empty">
-                  <td
-                    colSpan="5"
-                    className="px-4 py-6 text-center text-gray-500"
-                  >
-                    Không có truyện
-                  </td>
+        {tab === "story" && (
+          <div className="bg-white rounded-lg shadow overflow-x-auto">
+            <table className="min-w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    Tiêu đề
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    Tác giả
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    Thể Loại
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    Mô tả
+                  </th>
+                  <th className="px-4 py-3 text-right text-sm font-medium">
+                    Hành động
+                  </th>
                 </tr>
-              )}
-              {stories.map((s) => (
-                <tr key={s.StoryID} className="border-t">
-                  <td className="px-4 py-3">{s.StoryName}</td>
-                  <td className="px-4 py-3">{s.AuthorName}</td>
-                  <td className="px-4 py-3">{s.CategoryName}</td>                
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {s.Descrition}
-                  </td>
-                  <td className="px-4 py-3 text-right space-x-2">
-                    <button
-                      onClick={() => openEdit(s)}
-                      className="px-3 py-1 bg-yellow-400 text-black rounded hover:opacity-90"
+              </thead>
+              <tbody>
+                {stories.length === 0 && (
+                  <tr key="empty">
+                    <td
+                      colSpan="5"
+                      className="px-4 py-6 text-center text-gray-500"
                     >
-                      Sửa
-                    </button>
-                    <button
-                      onClick={() => handleDelete(s.StoryID)}
-                      className="px-3 py-1 bg-red-500 text-white rounded hover:opacity-90"
-                    >
-                      Xóa
-                    </button>
-                    <button
-                      onClick={() => openChapters(s)}
-                      className="px-3 py-1 bg-blue-600 text-white rounded hover:opacity-90"
-                    >
-                      Chapters ({(s.chapters || []).length})
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>)}
+                      Không có truyện
+                    </td>
+                  </tr>
+                )}
+                {stories.map((s) => (
+                  <tr key={s.StoryID} className="border-t">
+                    <td className="px-4 py-3">{s.StoryName}</td>
+                    <td className="px-4 py-3">{s.AuthorName}</td>
+                    <td className="px-4 py-3">{s.CategoryName}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {s.Descrition}
+                    </td>
+                    <td className="px-4 py-3 text-right space-x-2">
+                      <button
+                        onClick={() => openEdit(s)}
+                        className="px-3 py-1 bg-yellow-400 text-black rounded hover:opacity-90"
+                      >
+                        Sửa
+                      </button>
+                      <button
+                        onClick={() => handleDelete(s.StoryID)}
+                        className="px-3 py-1 bg-red-500 text-white rounded hover:opacity-90"
+                      >
+                        Xóa
+                      </button>
+                      <button
+                        onClick={() => openChapters(s)}
+                        className="px-3 py-1 bg-blue-600 text-white rounded hover:opacity-90"
+                      >
+                        Chapters ({(s.chapters || []).length})
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         {/* Story Modal */}
         {modalOpen && (
@@ -299,35 +321,37 @@ const handleDeleteUser = async (id) => {
 
               <label className="block mb-2 text-sm">Tên truyện</label>
               <input
-                value={form.storyName||""}
-                onChange={(e) => setForm({ ...form, storyName: e.target.value })}
+                value={form.storyName || ""}
+                onChange={(e) =>
+                  setForm({ ...form, storyName: e.target.value })
+                }
                 className="w-full mb-3 px-3 py-2 border rounded"
                 placeholder="Tên Truyện"
               />
 
               <label className="block mb-2 text-sm">Tác giả</label>
               <input
-                value={form.author||""}
+                value={form.author || ""}
                 onChange={(e) => setForm({ ...form, author: e.target.value })}
                 className="w-full mb-3 px-3 py-2 border rounded"
                 placeholder="Tác giả"
               />
               <label className="block mb-2 text-sm">Thể loại</label>
               <input
-                value={form.category||""}
+                value={form.category || ""}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                 className="w-full mb-3 px-3 py-2 border rounded"
                 placeholder="Thể Loại"
               />
               <label className="block mb-2 text-sm">Đường dẫn ảnh</label>
               <input
-                value={form.img||""}
+                value={form.img || ""}
                 onChange={(e) => setForm({ ...form, img: e.target.value })}
                 className="w-full mb-3 px-3 py-2 border rounded"
               />
               <label className="block mb-2 text-sm">Mô tả</label>
               <textarea
-                value={form.descrition||""}
+                value={form.descrition || ""}
                 onChange={(e) =>
                   setForm({ ...form, descrition: e.target.value })
                 }
@@ -423,7 +447,7 @@ const handleDeleteUser = async (id) => {
                   </h3>
                   <form onSubmit={handleChapterSubmit} className="space-y-3">
                     <input
-                      value={chapterForm.chapterNumber||""}
+                      value={chapterForm.chapterNumber || ""}
                       onChange={(e) =>
                         setChapterForm({
                           ...chapterForm,
@@ -434,7 +458,7 @@ const handleDeleteUser = async (id) => {
                       placeholder="Tiêu đề chapter"
                     />
                     <textarea
-                      value={chapterForm.content||""}
+                      value={chapterForm.content || ""}
                       onChange={(e) =>
                         setChapterForm({
                           ...chapterForm,
@@ -470,46 +494,57 @@ const handleDeleteUser = async (id) => {
             </div>
           </div>
         )}
-      </div>
-      {tab === "user" && (
-  <div className="bg-white rounded-lg shadow overflow-x-auto">
-    <table className="min-w-full">
-      <thead className="bg-gray-50">
-        <tr>
-          <th className="px-4 py-3 text-left text-sm font-medium">Tên</th>
-          <th className="px-4 py-3 text-left text-sm font-medium">Email</th>
-          <th className="px-4 py-3 text-left text-sm font-medium">Vai trò</th>
-          <th className="px-4 py-3 text-left text-sm font-medium">Hành động</th>
-        </tr>
-      </thead>
-      <tbody>
-        {users.length === 0 && (
-          <tr>
-            <td colSpan="4" className="px-4 py-6 text-center text-gray-500">
-              Không có người dùng
-            </td>
-          </tr>
-        )}
-        {users.map((u) => (
-          <tr key={u.UserID} className="border-t">
-            <td className="px-4 py-3">{u.UserName}</td>
-            <td className="px-4 py-3">{u.Email}</td>
-            <td className="px-4 py-3">{u.Role}</td>
-            <td className="px-4 py-3 text-right">
-              <button
-                onClick={() => handleDeleteUser(u.UserID)}
-                className="px-3 py-1 bg-red-500 text-white rounded hover:opacity-90"
-              >
-                Xóa
-              </button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)}
 
+        {tab === "user" && (
+          <div className="bg-white rounded-lg shadow overflow-x-auto">
+            <table className="min-w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    Tên
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    Email
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    Vai trò
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    Hành động
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan="4"
+                      className="px-4 py-6 text-center text-gray-500"
+                    >
+                      Không có người dùng
+                    </td>
+                  </tr>
+                )}
+                {users.map((u) => (
+                  <tr key={u.UserID} className="border-t">
+                    <td className="px-4 py-3">{u.UserName}</td>
+                    <td className="px-4 py-3">{u.Email}</td>
+                    <td className="px-4 py-3">{u.Role}</td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => handleDeleteUser(u.UserID)}
+                        className="px-3 py-1 bg-red-500 text-white rounded hover:opacity-90"
+                      >
+                        Xóa
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
       <Footer></Footer>
     </div>
   );
