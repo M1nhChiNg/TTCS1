@@ -39,7 +39,7 @@ const Banner = () => {
           src={`http://localhost/Website-Truyen/Assets/Img/${banner.Img}`}
           alt=""
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 cursor-pointer ${
-            i === index ? "opacity-100" : "opacity-0"
+            i === index ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
           }`}
           onClick={() => handleClick(banner.StoryID)}
         />

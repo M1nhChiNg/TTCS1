@@ -264,7 +264,7 @@ const Admin = () => {
       <div className="flex-1 max-w-5xl mx-auto mt-10 ">
         <header className="mb-6">
           <div className="flex justify-center">
-            <div className="inline-flex items-center gap-4">
+            <div className="inline-flex items-center gap-4 ">
               <button
                 onClick={() => setTab("story")}
                 className={`px-4 py-2 rounded-md ${
