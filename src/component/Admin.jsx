@@ -262,31 +262,33 @@ const Admin = () => {
     <div className=" min-h-screen bg-gray-100 flex flex-col">
       <Header></Header>
       <div className="flex-1 max-w-5xl mx-auto mt-10 ">
-        <header className="flex items-center justify-between mb-6">
-          <div className="flex gap-4">
-            <button
-              onClick={() => setTab("story")}
-              className={`px-4 py-2 rounded-md ${
-                tab === "story" ? "bg-black text-white" : "bg-gray-200"
-              }`}
-            >
-              Quản lý truyện
-            </button>
-            <button
-              onClick={() => setTab("user")}
-              className={`px-4 py-2 rounded-md ${
-                tab === "user" ? "bg-black text-white" : "bg-gray-200"
-              }`}
-            >
-              Quản lý người dùng
-            </button>
+        <header className="mb-6">
+          <div className="flex justify-center">
+            <div className="inline-flex items-center gap-4">
+              <button
+                onClick={() => setTab("story")}
+                className={`px-4 py-2 rounded-md ${
+                  tab === "story" ? "bg-black text-white" : "bg-gray-200"
+                }`}
+              >
+                Quản lý truyện
+              </button>
+              <button
+                onClick={() => setTab("user")}
+                className={`px-4 py-2 rounded-md ${
+                  tab === "user" ? "bg-black text-white" : "bg-gray-200"
+                }`}
+              >
+                Quản lý người dùng
+              </button>
+              <button
+                onClick={openAdd}
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:opacity-90"
+              >
+                Thêm truyện
+              </button>
+            </div>
           </div>
-          <button
-            onClick={openAdd}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:opacity-90"
-          >
-            Thêm truyện
-          </button>
         </header>
 
         {tab === "story" && (
