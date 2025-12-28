@@ -57,90 +57,93 @@ const Find = () => {
   };
 
   return (
-    <div className="bg-black pb-10">
+    <div className="bg-black pb-10 min-h-screen flex flex-col">
       <Header></Header>
-      <h1 className="text-2xl font-bold text-center mb-6 text-white">
-        Danh sách truyện
-      </h1>
+      <main className="flex-1">
+        <h1 className="text-2xl font-bold text-center mb-6 text-white">
+          Danh sách truyện
+        </h1>
 
-      {/* Danh sách tác giả & thể loại */}
-      <div className="grid grid-cols-2 gap-6 mb-10 text-white">
-        {/* Cột trái: tác giả */}
-        <div>
-          <h2 className="text-xl font-semibold mb-3 text-center">Tác giả</h2>
-          <div className="grid grid-cols-3 gap-3">
-            {authors.map((author) => (
-              <button
-                key={author.AuthorID}
-                onClick={() => handleSelectAuthor(author.AuthorID)}
-                className={`p-3 rounded-lg bg-yellow-400 border text-sm transition ${
-                  selectedAuthor === author.AuthorID
-                    ? "hover:scale-102 text-white border-blue-500"
-                    : "hover:scale-102 border-gray-300"
-                }`}
-              >
-                {author.AuthorName}
-              </button>
-            ))}
+        {/* Danh sách tác giả & thể loại */}
+        <div className="grid grid-cols-2 gap-6 mb-10 text-white">
+          {/* Cột trái: tác giả */}
+          <div>
+            <h2 className="text-xl font-semibold mb-3 text-center">Tác giả</h2>
+            <div className="grid grid-cols-3 gap-3">
+              {authors.map((author) => (
+                <button
+                  key={author.AuthorID}
+                  onClick={() => handleSelectAuthor(author.AuthorID)}
+                  className={`p-3 rounded-lg bg-yellow-400 border text-sm transition ${
+                    selectedAuthor === author.AuthorID
+                      ? "hover:scale-102 text-white border-blue-500"
+                      : "hover:scale-102 border-gray-300"
+                  }`}
+                >
+                  {author.AuthorName}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Cột phải: thể loại */}
+          <div>
+            <h2 className="text-xl font-semibold mb-3 text-center">Thể loại</h2>
+            <div className="grid grid-cols-3 gap-3">
+              {categories.map((cat) => (
+                <button
+                  key={cat.CategoryID}
+                  onClick={() => handleSelectCategory(cat.CategoryID)}
+                  className={`p-3 bg-blue-400 rounded-lg border text-sm transition ${
+                    selectedCategory === cat.CategoryID
+                      ? "hover:scale-102 text-white border-green-500"
+                      : "hover:scale-102 border-gray-300"
+                  }`}
+                >
+                  {cat.CategoryName}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Cột phải: thể loại */}
+        {/* Danh sách truyện */}
         <div>
-          <h2 className="text-xl font-semibold mb-3 text-center">Thể loại</h2>
-          <div className="grid grid-cols-3 gap-3">
-            {categories.map((cat) => (
-              <button
-                key={cat.CategoryID}
-                onClick={() => handleSelectCategory(cat.CategoryID)}
-                className={`p-3 bg-blue-400 rounded-lg border text-sm transition ${
-                  selectedCategory === cat.CategoryID
-                    ? "hover:scale-102 text-white border-green-500"
-                    : "hover:scale-102 border-gray-300"
-                }`}
-              >
-                {cat.CategoryName}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+          <h2 className="text-lg text-white font-semibold mb-3 text-center">
+            Kết quả tìm kiếm
+          </h2>
 
-      {/* Danh sách truyện */}
-      <div>
-        <h2 className="text-lg text-white font-semibold mb-3 text-center">
-          Kết quả tìm kiếm
-        </h2>
-
-        {stories.length > 0 ? (
-          <div className="flex flex-wrap gap-4 justify-start ">
-            {stories.map((story) => (
-              <Link
-                key={story.StoryID}
-                to={`/comics/${story.StoryID}`}
-                className="w-[200px] h-[380px] relative group shrink-0 bg-gray-800 overflow-hidden"
-              >
-                <div className="group-hover:scale-105 transition-transform duration-500 ease-in-out w-full h-full">
-                  <img
-                    src={`http://localhost/Website-Truyen/Assets/Img/${story.Img}`}
-                    alt={story.StoryName}
-                    className="w-full h-[300px] object-cover"
-                  />
-                  <div className="absolute mt-2 left-2">
-                    <h3 className="uppercase text-shadow-md text-white">
-                      {story.StoryName}
-                    </h3>
+          {stories.length > 0 ? (
+            <div className="flex flex-wrap gap-4 justify-start ">
+              {stories.map((story) => (
+                <Link
+                  key={story.StoryID}
+                  to={`/comics/${story.StoryID}`}
+                  className="w-[200px] h-[380px] relative group shrink-0 bg-gray-800 overflow-hidden"
+                >
+                  <div className="group-hover:scale-105 transition-transform duration-500 ease-in-out w-full h-full">
+                    <img
+                      src={`http://localhost/Website-Truyen/Assets/Img/${story.Img}`}
+                      alt={story.StoryName}
+                      className="w-full h-[300px] object-cover"
+                    />
+                    <div className="absolute mt-2 left-2">
+                      <h3 className="uppercase text-shadow-md text-white">
+                        {story.StoryName}
+                      </h3>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <p className="text-center text-gray-500 mt-6">
-            Chưa có truyện để hiển thị
-          </p>
-        )}
-      </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500 mt-6">
+              Chưa có truyện để hiển thị
+            </p>
+          )}
+        </div>
+      </main>
+      <Footer></Footer>
     </div>
   );
 };
