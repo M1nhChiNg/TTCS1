@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import Header from "./includes/Header";
 const Find = () => {
   const [categories, setCategories] = useState([]);
@@ -56,10 +57,11 @@ const Find = () => {
   };
 
   return (
-    
     <div className="bg-black pb-10">
       <Header></Header>
-      <h1 className="text-2xl font-bold text-center mb-6 text-white">Danh sách truyện</h1>
+      <h1 className="text-2xl font-bold text-center mb-6 text-white">
+        Danh sách truyện
+      </h1>
 
       {/* Danh sách tác giả & thể loại */}
       <div className="grid grid-cols-2 gap-6 mb-10 text-white">
@@ -107,27 +109,30 @@ const Find = () => {
       {/* Danh sách truyện */}
       <div>
         <h2 className="text-lg text-white font-semibold mb-3 text-center">
-           Kết quả tìm kiếm
+          Kết quả tìm kiếm
         </h2>
 
         {stories.length > 0 ? (
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="flex flex-wrap gap-4 justify-start ">
             {stories.map((story) => (
-              <div
+              <Link
                 key={story.StoryID}
-                className=" w-[200px] h-[400px] border rounded-lg p-4 shadow-md hover:shadow-2xl hover:-translate-y-2 hover:scale-105 transition duration-300 ease-in-out"
+                to={`/comics/${story.StoryID}`}
+                className="w-[200px] h-[380px] relative group shrink-0 bg-gray-800 overflow-hidden"
               >
-                <img
-                  src={`http://localhost/Website-Truyen/Assets/Img/${story.Img}`}
-                  alt={story.StoryName}
-                  className="w-full h-[300px] object-cover"
-                />
-                <h3 className="font-semibold text-white">{story.StoryName}</h3>
-                {/*<p className="text-sm text-gray-500">Tác giả: {story.AuthorName}</p>
-                <p className="text-sm text-gray-500">
-                  Thể loại: {story.CategoryName}
-                </p>*/}
-              </div>
+                <div className="group-hover:scale-105 transition-transform duration-500 ease-in-out w-full h-full">
+                  <img
+                    src={`http://localhost/Website-Truyen/Assets/Img/${story.Img}`}
+                    alt={story.StoryName}
+                    className="w-full h-[300px] object-cover"
+                  />
+                  <div className="absolute mt-2 left-2">
+                    <h3 className="uppercase text-shadow-md text-white">
+                      {story.StoryName}
+                    </h3>
+                  </div>
+                </div>
+              </Link>
             ))}
           </div>
         ) : (
